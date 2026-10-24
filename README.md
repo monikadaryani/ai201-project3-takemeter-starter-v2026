@@ -42,7 +42,13 @@
 <!-- Your community, and what your classifier sorts posts into. Three or four
      sentences. -->
 
-
+TakeMeter sorts comments from r/Cooking, a public subreddit where home cooks
+share dishes, ask for help, and argue about methods. Each comment is labelled
+`technique` (a method you could follow, or why something happens when you
+cook), `opinion` (a judgment or preference about food, with or without
+reasons, but no method), or `reaction` (a compliment, joke, personal story,
+or feeling about the post). The goal is to separate comments that teach
+something from ones that only judge or react.
 
 ---
 
@@ -54,33 +60,89 @@
      The decision rule is worth a point on its own and it's the thing most
      people leave out. Every taxonomy has a hardest boundary. Name yours. -->
 
-### `label_one`
+### `technique`
 
-**Definition:**
-
-**Example 1:**
->
-
-**Example 2:**
->
-
-### `label_two`
-
-**Definition:**
+**Definition:** Gives a method someone could follow in the kitchen, or
+explains why something happens when you cook.
 
 **Example 1:**
->
+> Cut the top and bottom off. Cut one side off. Run your knife along the
+> inside to separate the fleash from the seeds. Bam. Cutting through the seeds
+> causes them to go everywhere.
 
 **Example 2:**
+> The best advice on browning beef is LISTEN. You will hear the sound go from
+> a hiss (steaming) to a crackle (frying) and that is when it starts to go from
+> gray to brown.
+
+### `opinion`
+
+**Definition:** A judgment or preference about food or cooking in general,
+with or without reasons, that gives no method someone could follow.
+
+**Example 1:**
+> Air fryers aren't real fryers. I think the recipe creator lied to you.
+
+**Example 2:**
+> Puttanesca!
 >
+> I loveeee olives and it’s just such a delicious and simple pasta.
+
+*Renamed from `hot_take`.* The first version required "no reasoning," but
+food opinions almost always come with a quick reason ("I love olives", "it
+never comes out dry"). Under that rule only bare verdicts qualified, and an
+annotation review held back most of the label. Either reasoned opinions got
+their own route or they had to be excluded; excluding them would have left
+about 16 examples, so the label was broadened and renamed.
+
+### `reaction`
+
+**Definition:** A compliment, joke, personal story, or emotional response to
+the post that gives no advice and makes no argument.
+
+**Example 1:**
+> These sound delicious!!
+
+**Example 2:**
+> Learned this one only a few weeks ago. My lord have I cooked many meals with
+> boiled ground beef 😭
 
 ### The hardest boundary
 
-**Which two labels:**
+**Which two labels:** `technique` and `opinion`
+
+**The post that sits between them:**
+> The core of great chili con carne is dried chiles, lots of onion and cubed
+> (not ground) meat.
+>
+> Dried Chiles, toasted, rehydrated and blended to make a sauce are the real
+> key.
 
 **The decision rule I used every time:**
 <!-- e.g. "If the post names a specific checkable fact, it's `analysis`, even
      if the tone is heated." -->
+If the comment tells you something concrete to do or explains why something
+happens ("Don't crowd your pan.", "…because they soak up water and won't
+brown"), it's `technique`, even if it's phrased as a strong opinion. If it
+passes judgment, saying something is good, bad, better, or overrated, it's
+`opinion`, even when it gives reasons. Reasons for *liking* something ("it's
+so simple", "I love olives") don't make it `technique`; only a method you
+could follow or an explanation of what happens in the pan does.
+
+More rules I applied every time:
+
+- **Opinion vs. reaction: general or personal?** A judgment about food or
+  cooking in general ("Can't go wrong with Chef John") is `opinion`. A
+  response to this post or this person ("These sound delicious!!") is
+  `reaction`.
+- **A usable tip wins.** If a story or compliment contains real cooking
+  guidance someone could follow ("I shared it with the instruction to use a
+  sh!t-ton more garlic than it calls for"), it's `technique`. Jokes and
+  sarcasm stay `reaction` even when they mention a method ("don't stew
+  pineapple in a copper pot with an aluminum lid, that's called a battery").
+- **Off-topic comments are dropped, not forced into a label.** Hosting
+  etiquette arguments, food-history trivia, and side arguments between
+  commenters were removed from the dataset.
 
 
 
@@ -91,19 +153,39 @@
 <!-- Where you collected from, how you labelled, your counts, and three hard
      cases. -->
 
-**Where the posts came from:**
+**Where the posts came from:** Public comments from 12 r/Cooking threads,
+saved on 22 October 2026 and extracted with `extract_comments.py` (at most 30
+comments per thread). The threads mix question posts ("Why is cooked celery
+not a more common ingredient?"), "I made this" posts, and opinion threads.
+320 comments were collected and cut to 200:
+
+- 69 dropped as out of scope: link-only, replies that only make sense next to
+  their parent comment, hosting-etiquette arguments, food trivia, and side
+  arguments between commenters.
+- 51 trimmed for size: comments over 100 words (the model truncates at 128
+  tokens) and near-duplicate suggestions. 4 of these were added back to reach
+  200.
+- 4 more dropped during review because they couldn't be labelled without
+  their parent comment.
 
 **How I labelled them:** <!-- Cold first? Pre-labelled with AI and corrected?
 Say so plainly — the disclosure is required, not penalised. -->
+Pre-labelled with AI, then reviewed. Claude pre-labelled all comments. A
+second model, ChatGPT, reviewed every label. I personally checked and decided
+52 rows: every row where the two models disagreed, every row ChatGPT held
+back as unclear, the rows added back, and a few I checked at the start. The other 148 labels are ones both
+models agreed on and I did not change. The taxonomy was revised during review:
+`hot_take` became `opinion` when reasoned opinions turned out not to fit
+anywhere.
 
 **Counts per label:**
 
 | Label | Count | Share |
 |---|---|---|
-|  |  |  |
-|  |  |  |
-|  |  |  |
-| **Total** |  | 100% |
+| `technique` | 85 | 42.5% |
+| `reaction` | 74 | 37% |
+| `opinion` | 41 | 20.5% |
+| **Total** | 200 | 100% |
 
 **Three hard cases**
 
@@ -111,25 +193,36 @@ Say so plainly — the disclosure is required, not penalised. -->
      been, and what you chose. These are worth more than the easy 190. -->
 
 **1.**
-> *The post:*
+> *The post:* "Yep. Chilis ironically make really good chili"
 >
-> *Could have been:*
+> *Could have been:* `reaction` (a joke reply) or `technique`
 >
-> *I chose, because:*
+> *I chose, because:* `technique`. Under the joke there's a sincere, usable
+> idea: build chili on real chiles, not just chili powder. The two models
+> split on this one.
 
 **2.**
-> *The post:*
+> *The post:* "My friend makes them from Fruity Pebbles. THC infused butter
+> but still...."
 >
-> *Could have been:*
+> *Could have been:* `technique` (an ingredient swap) or `reaction`
 >
-> *I chose, because:*
+> *I chose, because:* `reaction`. It names ingredients, but the point is the
+> joke, not a suggestion anyone is meant to follow. Next to case 1, this
+> shows where my joke-versus-tip line sits.
 
 **3.**
-> *The post:*
+> *The post:* "Whatever you do DO NOT add noodles or serve with a peanut
+> butter sandwich. Jesus, midwesterners scare the shit outta me. Folks should
+> remember us western folks blessed you with the perfection proper chili
+> is...."
 >
-> *Could have been:*
+> *Could have been:* `technique` (a literal instruction about what not to
+> add) or `opinion`
 >
-> *I chose, because:*
+> *I chose, because:* `opinion`. It's phrased as an instruction, but it's a
+> verdict on what "proper" chili is, not a method. The rest of the comment
+> is regional gatekeeping, not cooking guidance.
 
 ---
 
