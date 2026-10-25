@@ -230,16 +230,31 @@ anywhere.
 
 <!-- Your starting model, your settings, and anything you changed and why. -->
 
-**Base model:**
+**Base model:** `distilbert-base-uncased`
 
 **Settings:** <!-- epochs, learning rate, batch size, seed -->
+3 epochs, learning rate 2e-5, batch size 16, seed 42, max length 128 tokens.
+Trained on an Apple Silicon GPU (MPS), torch 2.14.1.
 
-**Anything I changed from the defaults, and why:**
+**Anything I changed from the defaults, and why:** Only `LABELS`, set to my
+three labels. The training settings are the defaults. Max length stayed at
+128 because I removed every comment over 100 words while building the
+dataset, so nothing gets truncated.
 
 **Split sizes:** <!-- train / val / test, and per-label counts in the test
 split. If a label had fewer than about 8 in test, say so — it explains a lot
 of next unit's variance. -->
 
+| Label | Train | Val | Test |
+|---|---|---|---|
+| `technique` | 59 | 13 | 13 |
+| `reaction` | 51 | 12 | 11 |
+| `opinion` | 29 | 6 | 6 |
+| **Total** | 139 | 31 | 30 |
+
+`opinion` has only **6** examples in the test split, under the roughly 8
+where scores stop jumping around. Its F1 will swing a lot between seeds, which
+is why criterion 3 sets a looser target for it.
 
 
 ---
@@ -253,19 +268,44 @@ of next unit's variance. -->
      workflow and disclosing it costs you nothing. Not disclosing it is the
      problem. -->
 
-**Moment 1**
+**Moment 1: choosing the community**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* Help picking a public community. I started with
+  r/GirlDinnerDiaries, which I read a lot, and pasted a real thread into
+  Claude.
+- *What came back:* Claude said the thread was almost all sympathy comments,
+  the sub's "be kind" rules remove hot takes, and the posts were too personal
+  (a child's diagnosis, a pregnancy decision) to quote in a README. It
+  suggested r/Cooking or r/personalfinance instead.
+- *What I changed:* I tried staying with r/GirlDinnerDiaries anyway, then
+  dropped it myself because the posts didn't teach anything. I switched to
+  r/Cooking, chose the 12 threads, and saved them from my browser, since
+  Reddit blocked script access.
 
-**Moment 2**
+**Moment 2: a second model reviewing the labels**
 
-- *What I asked for:*
-- *What came back:*
-- *What I changed:*
+- *What I asked for:* I gave ChatGPT my label definitions and Claude's
+  pre-labels and asked it to review every row.
+- *What came back:* It agreed with most labels but held back 28 rows. Most
+  were opinions with a reason attached ("Puttanesca! I love olives…"), which
+  the old `hot_take` definition ("no reasoning") didn't allow. It also
+  relabelled several jokes as `technique` because they mentioned an
+  ingredient.
+- *What I changed:* I renamed `hot_take` to `opinion` and broadened it to
+  allow reasons, rather than throwing out the held rows. Then I decided every
+  disputed row myself. Sometimes I sided with ChatGPT ("Chilis ironically
+  make really good chili" → `technique`), sometimes with Claude ("THC infused
+  butter but still…" stayed `reaction`), and sometimes with neither (the
+  chili-on-noodles defence → `opinion`, where both models said
+  `technique`).
 
-**Pre-labelling disclosure:**
+**Pre-labelling disclosure:** Claude pre-labelled all the comments, and
+ChatGPT reviewed every label. I personally decided 52 rows: every row where
+the two models disagreed, every row ChatGPT held back, 4 rows added back
+late, and a few I checked at the start. The other 148 rows carry labels that
+both models agreed on, and I did not re-read each of those individually.
+Claude also wrote `extract_comments.py`, and helped draft the README and
+`criteria.md`.
 
 <!-- ═══════════════════════ UNIT 6 — THE TEST ═══════════════════════
 
