@@ -51,63 +51,82 @@ whether you hit them:
 
 ---
 
-## 1.
+## 1. Overall accuracy
 
-<!-- Your criterion. It must name a number. -->
-
-
+Overall accuracy is at least **0.65** on the held-out test split, in all three
+seeds.
 
 **Why this target:**
 
-
+Guessing gets 33%, and always predicting my biggest label (`technique`, 85 of
+200) gets 42.5%. A useful model has to beat that clearly, and 0.65 is more than
+20 points above it. The test split is only 30 comments, so each one is worth
+about 3 points: 0.65 means getting 20 of 30 right in the worst of the three
+seeds.
 
 ---
 
-## 2.
+## 2. Per-label: `technique`
 
-<!-- Your criterion. -->
-
-
+`technique` has an F1 of at least **0.70** on the test split, in all three
+seeds.
 
 **Why this target:**
 
-
+It's the label the tool exists for: separating comments that teach from ones
+that don't. It's also my biggest label (about 13 comments in each test split),
+and it has the clearest surface signals, like instructions ("Cut the top and
+bottom off"), quantities and ingredient lists. If the model can't find it
+reliably, nothing else matters. So it gets the strictest target.
 
 ---
 
-## 3.
+## 3. Per-label: no label falls apart
 
-<!-- Your criterion. -->
-
-
+Every label has an F1 of at least **0.45** on the test split, in all three
+seeds.
 
 **Why this target:**
 
-
+This is set by `opinion`, my smallest label: 41 comments, so only about 6 per
+test split, and one wrong guess moves its F1 by 0.1 or more. It's also the
+label whose definition changed during labelling (it started as `hot_take`), and
+its boundary with `technique` was the one the two AI labellers disagreed on
+most. A label that's 20% of the data would get an F1 of about 0.2 by guessing,
+so 0.45 still means the model learned something. A strict target here would
+just measure which seed got lucky.
 
 ---
 
-## 4.
+## 4. Consistency
 
-<!-- Your criterion. -->
-
-
+When I label the 30 staff posts under the staff taxonomy, I agree with the staff
+labels on at least **80%** (24 of 30), measured with `agreement.py`.
 
 **Why this target:**
 
-
+Building my own dataset showed where labelling breaks down: ChatGPT kept my
+pre-labels on 157 of 200 comments (78.5%), and almost every disagreement was
+on one boundary, a tip versus an opinion or a joke. The staff taxonomy has the
+same kind of boundary (`analysis` versus `hot_take`). If I can't apply a
+written rule at least 80% of the time, the model's mistakes can't be separated
+from mine.
 
 ---
 
-## 5.
+## 5. Confidence
 
-<!-- Your criterion. -->
-
-
+The model's most-confident third of test predictions is at least **0.15** more
+accurate than its least-confident third, in all three seeds.
 
 **Why this target:**
 
-
+My data has easy and hard comments. Short compliments ("That sounds
+delicious!") and step-by-step recipes should be easy calls, while stories with
+a tip buried inside, and jokes that mention an ingredient, are genuinely hard,
+even for me. If the model's confidence means anything, it should be right more
+often on the first kind. Each third is only about 10 comments, so 0.15 means a
+gap of at least 2 comments, small enough that one swing doesn't decide it.
 
 ---
 
