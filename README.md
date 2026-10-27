@@ -319,16 +319,26 @@ Claude also wrote `extract_comments.py`, and helped draft the README and
 <!-- Both models on the same posts. `python baseline.py --trained results.json`
      prints this table for you. -->
 
-| Measure | Baseline | Trained | Difference |
+| Measure | Baseline | Baseline-names-only | Trained | Difference |
 |---|---|---|---|
-| Overall accuracy |  |  |  |
-| Macro F1 |  |  |  |
-| F1 — `label_one` |  |  |  |
-| F1 — `label_two` |  |  |  |
+| Overall accuracy | 0.667 | 0.500 |  |  |
+| Macro F1 | 0.496 | 0.496 |  |  |
+| F1 — `opinion` | 0.000 | 0.667  |  |  |
+| F1 — `technique` | 0.727 | 0.571 |  |  |
+| F1 — `reaction` | 0.762 | 0.250 |  |  |
 
 **What I predicted before I looked:**
 <!-- Milestone 1 asks you to write this BEFORE seeing the trained numbers. A
      prediction made afterwards isn't one. -->
+Trained accuracy around **0.75**, about 8 points above the baseline's 0.667.
+`technique` and `reaction` will roughly match the baseline (within about
+0.05), because it's already strong on them (0.727 and 0.762). The fine-tuned
+model learned from only 139 examples, so it may not beat a much bigger model
+there. The big change will be `opinion`: the baseline never got one right
+(F1 0.000). I expect the trained model to get it off zero, but stay **below
+0.45**, because it has only 29 training examples and 6 test examples. If the
+trained model only ties the baseline overall, the gain will come almost
+entirely from `opinion`.
 
 **What the gap actually means:**
 <!-- If the baseline matched your trained model, your fine-tuning added
