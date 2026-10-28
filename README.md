@@ -305,7 +305,8 @@ the two models disagreed, every row ChatGPT held back, 4 rows added back
 late, and a few I checked at the start. The other 148 rows carry labels that
 both models agreed on, and I did not re-read each of those individually.
 Claude also wrote `extract_comments.py`, and helped draft the README and
-`criteria.md`.
+`criteria.md`. In unit 6, Claude also labelled the 30 staff posts for the
+agreement check (see the Agreement Report).
 
 <!-- ═══════════════════════ UNIT 6 — THE TEST ═══════════════════════
 
@@ -363,7 +364,7 @@ entirely from `opinion`.
 | 1. Overall accuracy | ≥ 0.65 | 0.667 | 0.467 | 0.667 | **Miss** (seed 7) |
 | 2. `technique` F1 | ≥ 0.70 | 0.727 | 0.619 | 0.722 | **Miss** (seed 7) |
 | 3. Every label F1 (lowest shown) | ≥ 0.45 | 0.000 (`opinion`) | 0.000 (`opinion`) | 0.000 (`opinion`) | **Miss** (all seeds) |
-| 4. Agreement with staff labels | ≥ 80% | — | — | — | **Not measured yet** (needs `agreement.py`) |
+| 4. Agreement with staff labels | ≥ 80% | 100% (30/30) | n/a | n/a | **Hit**, but labelled by Claude, not me (see Agreement Report) |
 | 5. Most-sure third minus least-sure third | ≥ 0.15 | 0.10 (0.80 − 0.70) | 0.40 (0.60 − 0.20) | 0.30 (0.90 − 0.60) | **Miss** (seed 42) |
 
 Accuracy moved 0.200 across seeds (0.467 to 0.667), more than the 10 points
@@ -435,7 +436,8 @@ ingredient names ("Pasta alla zozzona… cured pork… tomatoes"), and with only
      data/staff_taxonomy.md, not your own — so every argument below is made
      from those definitions and those decision rules. -->
 
-**Agreement rate:** ___ / 30 = ___%
+**Agreement rate:** 30 / 30 = 100%
+
 
 <!-- Nobody grades this number. A 60% who argues every disagreement from the
      stated rules beats a 95% who wrote "staff was right" nine times. Several
@@ -457,26 +459,34 @@ ingredient names ("Pasta alla zozzona… cured pork… tomatoes"), and with only
      written rule two different ways on 30 posts, that is direct evidence about
      what you did across your own 200. -->
 
-**1.**
-> *The post:*
->
-> *Staff said / I said:*
->
-> *My call, and why:*
->
-> *Which pile:*
-
-**2.**
-> *The post:*
->
-> *Staff said / I said:*
->
-> *My call, and why:*
->
-> *Which pile:*
+None. Every one of the 30 matched staff.
 
 **What the pattern in my disagreements tells me:**
 
+With no disagreements there's no pattern to read. The real question is
+whether the set was easy or the rule is tight. I think it's mostly the set,
+with tight rules helping.
+
+- **The set was easy.** The posts were separable at a glance. Every
+  `analysis` post builds its argument on a number (split times, eleven weeks
+  of sleep data, a remeasured route). Every `hot_take` is a one-line verdict.
+  Every `reaction` is about the last few hours of the writer's own life. No
+  post mixed two of these the way my r/Cooking comments did, where a story
+  with a tip buried in it was normal.
+- **The likely traps were covered word for word by the rules.** "Times are
+  down about 3%… so obviously the shoes are the whole story" (sp_014) has a
+  statistic, but it's almost the exact worked example under rule 1 (a
+  statistic used as decoration is a `hot_take`). "Four minutes off. FOUR."
+  (sp_021) has a time in it, but rule 3 settles it: it's a `reaction` about a
+  feeling, not an argument. When the hard cases come with worked examples,
+  matching staff tests reading more than judgment.
+- **My own taxonomy is not this tight.** On my 200 r/Cooking comments, Claude
+  and ChatGPT agreed on only about 79% of labels, and almost every
+  disagreement was on one boundary (`technique` vs `opinion`, or a joke vs a
+  tip). The staff rules each come with worked examples; most of mine were
+  written after the disagreements turned up. A 100% here doesn't show my own
+  labels are 100% consistent. It shows the gap between a rule with worked
+  examples and one without.
 
 
 ---
