@@ -361,15 +361,27 @@ entirely from `opinion`.
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
 |---|---|---|---|---|---|
-| 1. Overall accuracy | ≥ 0.65 | 0.667 | 0.467 | 0.667 | **Miss** (seed 7) |
-| 2. `technique` F1 | ≥ 0.70 | 0.727 | 0.619 | 0.722 | **Miss** (seed 7) |
-| 3. Every label F1 (lowest shown) | ≥ 0.45 | 0.000 (`opinion`) | 0.000 (`opinion`) | 0.000 (`opinion`) | **Miss** (all seeds) |
-| 4. Agreement with staff labels | ≥ 80% | 100% (30/30) | n/a | n/a | **Hit**, but labelled by Claude, not me (see Agreement Report) |
-| 5. Most-sure third minus least-sure third | ≥ 0.15 | 0.10 (0.80 − 0.70) | 0.40 (0.60 − 0.20) | 0.30 (0.90 − 0.60) | **Miss** (seed 42) |
+| 1. Overall accuracy | ≥ 0.65 | 0.667 | 0.467 | 0.667 | MISSED |
+| 2. F1 on `technique` | ≥ 0.70 | 0.727 | 0.619 | 0.722 | MISSED |
+| 3. Every label F1 | ≥ 0.45 | 0.000 | 0.000 | 0.000 | MISSED |
+| 4. Agreement with staff labels | ≥ 80% | 100% | 100% | 100% | MET |
+| 5. Confidence gap (most-sure third minus least-sure third) | ≥ 0.15 | 0.10 | 0.40 | 0.30 | MISSED |
+
+Notes on the table:
+
+- **Criterion 1 and 2:** both missed only because of seed 7. Seeds 42 and
+  2024 clear the target.
+- **Criterion 3:** each value is the lowest F1 of the three labels. It's
+  `opinion` every time: the model never predicted `opinion` in any seed.
+- **Criterion 4:** agreement doesn't depend on the seed. It's one measurement
+  of 30 staff posts, repeated in each column. Those posts were labelled by
+  Claude, not me (see the Agreement Report).
+- **Criterion 5:** the per-seed gaps are 0.80 − 0.70, 0.60 − 0.20, and
+  0.90 − 0.60. Missed on seed 42.
 
 Accuracy moved 0.200 across seeds (0.467 to 0.667), more than the 10 points
-the notebook treats as a stable measure. Seed 7 collapsed: it scored exactly
-what you get by calling almost everything `technique`.
+the notebook treats as a stable measure. Seed 7 collapsed: it called 29 of
+30 posts `technique`.
 
 ### Confusion matrix
 
@@ -407,11 +419,11 @@ ingredient names ("Pasta alla zozzona… cured pork… tomatoes"), and with only
 
 | # | Criterion | Target | Verdict | How I decided |
 |---|---|---|---|---|
-| 1 |  |  |  |  |
-| 2 |  |  |  |  |
-| 3 |  |  |  |  |
-| 4 |  |  |  |  |
-| 5 |  |  |  |  |
+| 1 | Overall accuracy | ≥ 0.65 | MISSED | Seed 7 scored 0.467. Seeds 42 and 2024 scored 0.667 |
+| 2 | F1 on `technique` | ≥ 0.70 | MISSED | Seed 7 scored 0.619. Seeds 42 and 2024 scored 0.727 and 0.722 |
+| 3 | Every label F1 | ≥ 0.45 | MISSED | `opinion` scored 0.000 in all three seeds |
+| 4 | Agreement with staff labels | ≥ 80% | MET | 30/30 = 100%, from one measurement that doesn't vary by seed |
+| 5 | Confidence gap | ≥ 0.15 | MISSED | Seed 42 gap was 0.10. Seeds 7 and 2024 were 0.40 and 0.30 |
 
 **Diagnoses**
 
@@ -424,6 +436,53 @@ ingredient names ("Pasta alla zozzona… cured pork… tomatoes"), and with only
      have that can tell a LABELLING problem from a MODEL problem, and this
      section is graded on whether you used it that way. -->
 
+**What the agreement report can and can't tell me.** The 30 staff posts were
+pre-labelled by Claude, the same model that pre-labelled my 200 comments. Matching
+staff 30/30 shows that this labeller applies a tight, written rule
+consistently. So my labelling method isn't random noise. It doesn't show that
+my own rules were tight. The evidence on that points the other way: Claude and
+ChatGPT agreed on only about 79% of my 200 labels, and almost every
+disagreement was on `technique` vs `opinion`. That gap between 100% on a
+well-written rule and about 79% on mine is what separates a labelling problem
+from a model problem in the diagnoses below.
+
+**Criteria 1 and 2 (accuracy, `technique` F1): a model that can't reach a
+stable answer from this much data.** Both missed only because of seed 7, which
+predicted `technique` for 29 of 30 posts. Its scores (0.467 accuracy, 0.619
+`technique` F1) are what you'd get by guessing the biggest label almost every
+time. This isn't a labelling problem: the labels are identical in every seed,
+and on seeds 42 and 2024 the same data trained a model that separates
+`technique` from `reaction` well (F1 around 0.72 and 0.76–0.78). With 139
+training examples and 3 epochs, one unlucky split was enough for training to
+settle on "say `technique`" instead of learning the labels.
+
+**Criterion 3 (every label F1): too few examples, on a boundary I didn't apply
+consistently.** `opinion` scored 0.000 in every seed. The model never predicted
+it once, and nearly every real `opinion` was called `technique` (5 of 6 in seed
+42, 6 of 6 in seeds 7 and 2024). Three pieces of evidence:
+
+- **Too few examples.** Only 29 `opinion` comments in training, against 59
+  `technique`. My opinions are full of dish and ingredient names, so to a model
+  with this little data they look like `technique`.
+- **A labelling problem, not only a model problem.** The agreement contrast
+  above says my `technique`/`opinion` line was the least consistent part of my
+  data: it's where the two labellers disagreed most, and the label was
+  redefined partway through (`hot_take` became `opinion`). A rule that two
+  careful labellers split on about one time in five gives the model mixed
+  signals.
+- **My definition made it harder, not easier.** The zero-shot baseline also
+  scored 0.000 on `opinion` when given my written definitions, but 0.667 when
+  given only the bare label names. A much bigger model found the word
+  "opinion" clearer than my definition of it. That points at the definition,
+  not just the amount of data.
+
+**Criterion 5 (confidence gap): a measurement too small to be stable.** Each
+third of the test split is only 10 posts, so one post moves the accuracy by
+0.10. Seed 42 missed by exactly one post: it scored 0.80 vs 0.70, and one
+more right answer in the top third (0.90) or one fewer in the bottom third
+(0.60) would have cleared it. Seeds 7 and 2024 cleared it easily (0.40 and
+0.30). This says more about how small the test set is than about whether the
+model's confidence means anything. It's not a labelling problem.
 
 
 ---
