@@ -320,12 +320,17 @@ Claude also wrote `extract_comments.py`, and helped draft the README and
      prints this table for you. -->
 
 | Measure | Baseline | Baseline-names-only | Trained | Difference |
-|---|---|---|---|
-| Overall accuracy | 0.667 | 0.500 |  |  |
-| Macro F1 | 0.496 | 0.496 |  |  |
-| F1 — `opinion` | 0.000 | 0.667  |  |  |
-| F1 — `technique` | 0.727 | 0.571 |  |  |
-| F1 — `reaction` | 0.762 | 0.250 |  |  |
+|---|---|---|---|---|
+| Overall accuracy | 0.467 | 0.500 | 0.667 | +0.200 |
+| Macro F1 | 0.262 | 0.496 | 0.496 | +0.234 |
+| F1 — `opinion` | 0.000 | 0.667 | 0.000 | 0.000 |
+| F1 — `technique` | 0.619 | 0.250 | 0.727 | +0.108 |
+| F1 — `reaction` | 0.167 | 0.571 | 0.762 | +0.595 |
+
+Baseline is `facebook/bart-large-mnli` zero-shot with `label_definitions.txt`;
+Baseline-names-only is the same model given only the three label names.
+Trained is seed 42 (`results.json`). Difference is Trained minus Baseline. All
+three are scored on the same 30 held-out posts.
 
 **What I predicted before I looked:**
 <!-- Milestone 1 asks you to write this BEFORE seeing the trained numbers. A
@@ -355,28 +360,41 @@ entirely from `opinion`.
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
 |---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |
+| 1. Overall accuracy | ≥ 0.65 | 0.667 | 0.467 | 0.667 | **Miss** (seed 7) |
+| 2. `technique` F1 | ≥ 0.70 | 0.727 | 0.619 | 0.722 | **Miss** (seed 7) |
+| 3. Every label F1 (lowest shown) | ≥ 0.45 | 0.000 (`opinion`) | 0.000 (`opinion`) | 0.000 (`opinion`) | **Miss** (all seeds) |
+| 4. Agreement with staff labels | ≥ 80% | — | — | — | **Not measured yet** (needs `agreement.py`) |
+| 5. Most-sure third minus least-sure third | ≥ 0.15 | 0.10 (0.80 − 0.70) | 0.40 (0.60 − 0.20) | 0.30 (0.90 − 0.60) | **Miss** (seed 42) |
+
+Accuracy moved 0.200 across seeds (0.467 to 0.667), more than the 10 points
+the notebook treats as a stable measure. Seed 7 collapsed: it scored exactly
+what you get by calling almost everything `technique`.
 
 ### Confusion matrix
 
 <!-- ⚠️ TYPED AS A MARKDOWN TABLE. The notebook prints one ready to paste.
      An image of a matrix earns nothing. -->
 
-| true \ predicted |  |  |  |
+Seed 42, 30 held-out posts.
+
+| true \ predicted | opinion | technique | reaction |
 |---|---|---|---|
-| **** |  |  |  |
-| **** |  |  |  |
-| **** |  |  |  |
+| **opinion** | 0 | 5 | 1 |
+| **technique** | 0 | 12 | 1 |
+| **reaction** | 0 | 3 | 8 |
 
 **My biggest off-diagonal number, and what it means:**
 <!-- Not "the model made mistakes" — WHICH boundary it didn't learn, and which
      direction. "7 real analysis posts were called hot_take and only 3 went the
      other way" is a direction, not just an error rate. -->
-
+5 real `opinion` posts were called `technique`, and none went the other way.
+The whole `opinion` column is zero: the model never predicts `opinion` at all,
+in any seed. So it didn't learn the `opinion`/`technique` boundary, and it
+fails in one direction only: opinions get absorbed into `technique`. That's
+the same boundary that was hardest to label. My opinions are full of dish and
+ingredient names ("Pasta alla zozzona… cured pork… tomatoes"), and with only
+29 training examples, the model seems to treat food words as a sign of
+`technique` instead of looking for an actual method.
 
 
 ---
