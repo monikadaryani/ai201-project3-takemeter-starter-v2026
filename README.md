@@ -245,7 +245,9 @@ anywhere.
 Trained on an Apple Silicon GPU (MPS), torch 2.14.1.
 
 **Anything I changed from the defaults, and why:** Only `LABELS`, set to my
-three labels. The training settings are the defaults. Max length stayed at
+three labels. The training settings are the defaults for the unit 5 run and
+for the improvement run. A separate stretch run changed epochs from 3 to 8;
+see [Stretch Goals](#stretch-goals). Max length stayed at
 128. I measured every comment with the `distilbert-base-uncased` tokenizer:
 the longest is 124 tokens including the special tokens, so nothing gets
 truncated. That holds for the 400-row dataset as well. (An earlier version of
@@ -350,7 +352,8 @@ ChatGPT's review did not dispute.
 100% agreement rate measures Claude (see the Agreement Report).
 
 *Other AI help.* Claude wrote `extract_comments.py`, ran the baseline
-script, and drafted most of this README and `criteria.md` from my decisions
+script, ran the 8-epoch stretch training run (reusing the notebook's own
+code, with only `EPOCHS` changed), and drafted most of this README and `criteria.md` from my decisions
 and the result files: the Run Logs, diagnoses, the Improvement write-up, and
 What's Still Broken. I reviewed and directed those drafts. The labelling
 decisions listed above, the choice of community, the choice of improvement,
@@ -822,7 +825,9 @@ this criterion was undertraining. The extra rows doubled the steps per epoch
 (9 → 18), but 3 epochs is still only about 54 training steps. *Why I
 stopped:* it's a training change, and I'd already changed the data in this
 round. Doing both at once would make it impossible to say what moved the
-numbers.
+numbers. *Update:* I tested this afterwards as a separate stretch run. With 8
+epochs, criterion 1 is met in all three seeds (0.683 / 0.767 / 0.667). See
+[Stretch Goals](#stretch-goals).
 
 **Criterion 2: F1 on `technique` (0.622 / 0.750 / 0.756, target 0.70).**
 Only seed 42 missed. In that seed, 6 of 20 real `technique` comments were
@@ -845,7 +850,10 @@ more varied threads. 81 of the new opinions came from just two threads, so the
 model may have learned those threads' style rather than the label. *Why I
 stopped:* rewording the definition means relabelling and reviewing the
 boundary again. That's a bigger job than the one improvement this unit asks
-for, and it's the next step.
+for, and it's the next step. *Update:* the 8-epoch stretch run also met this
+criterion (lowest label F1 0.650 / 0.737 / 0.529). The `opinion` boundary was
+learnable with more training, though seed 2024 (0.529) shows it's still the
+least stable label.
 
 **The gap between what I meant my labels to capture and what the model
 learned:**
@@ -859,6 +867,74 @@ as stories called `reaction`, so the model learned what a comment *sounds*
 like (food words → `technique`, "I" and "my" → `reaction`), not whether it
 teaches, judges, or reacts.
 
+
+---
+
+## Stretch Goals
+
+**Stretch 1: 50+ extra examples for the thinnest label (done).** `opinion`
+was my thinnest label, with 41 examples and an F1 of 0.000 in every seed. I
+added **90 more** (41 → 131), well past the 50 the stretch asks for. The new
+examples came from two opinion-heavy r/Cooking threads ("Your ACTUAL
+unpopular food opinion", "What is your favorite dish that others hate"),
+plus 11 opinions from other threads so the label isn't tied to two
+discussions. They follow the same rules as the original batch: the
+broadened `opinion` definition, no context-only replies, at most 100 words.
+This was part of the main improvement (see [The Improvement](#the-improvement)
+for how the rows were labelled and checked). Effect: `opinion` F1 went from
+0.000 to 0.35–0.40 across the three seeds.
+
+**Stretch 2: second training run with a changed hyperparameter (done).**
+I changed one setting: **epochs from 3 to 8.** Everything else was identical
+to the "after" run: the same 400 rows, the same three seeds and therefore the
+same splits and test posts, learning rate 2e-5, batch size 16. Both runs are
+scored on exactly the same 60 posts per seed, so this is a clean
+one-variable comparison. The diagnosis for criteria 1 and 2 pointed here:
+undertraining. 3 epochs on 279 training rows is only about 54 steps.
+Results: `results_three_seeds_epochs8.json`.
+
+| Criterion | Target | 3 epochs (42 / 7 / 2024) | Verdict | 8 epochs (42 / 7 / 2024) | Verdict |
+|---|---|---|---|---|---|
+| 1. Overall accuracy | ≥ 0.65 | 0.583 / 0.600 / 0.617 | MISSED | 0.683 / 0.767 / 0.667 | **MET** |
+| 2. F1 on `technique` | ≥ 0.70 | 0.622 / 0.750 / 0.756 | MISSED | 0.684 / 0.737 / 0.727 | MISSED |
+| 3. Every label F1 (lowest) | ≥ 0.45 | 0.370 / 0.400 / 0.345 | MISSED | 0.650 / 0.737 / 0.529 | **MET** |
+| 4. Staff agreement | ≥ 80% | 100% | MET | 100% | MET |
+| 5. Confidence gap | ≥ 0.15 | 0.15 / 0.45 / 0.20 | MET | 0.15 / 0.45 / 0.20 | MET |
+| *Macro F1* | | 0.553 / 0.582 / 0.584 | | 0.683 / 0.764 / 0.657 | |
+| *`opinion` F1* | | 0.370 / 0.400 / 0.345 | | 0.714 / 0.737 / 0.529 | |
+
+Confusion matrix, 8 epochs, seed 42:
+
+| true \ predicted | opinion | technique | reaction |
+|---|---|---|---|
+| **opinion** | 15 | 3 | 2 |
+| **technique** | 2 | 13 | 5 |
+| **reaction** | 5 | 2 | 13 |
+
+**Did it help? Yes, clearly.** Four of five criteria are now met, up from
+two. Macro F1 rose by 0.07–0.18 in every seed. The biggest change is
+`opinion`: 15 of 20 real opinions are now caught in seed 42, against 5
+before, and only 3 are called `technique`, against 9. So the
+undertraining diagnosis was right. With 3 epochs the model hadn't trained
+long enough to learn the `opinion` boundary that the extra data made
+learnable. The two changes worked together: balancing gave `opinion` enough
+examples, and more epochs gave the model time to use them.
+
+**What it didn't fix:** criterion 2 is still missed, by seed 42 only (0.684
+against 0.70). There, 5 of 20 `technique` comments were still called
+`reaction`: tips told as stories, the same weakness as before. The confidence
+gaps are unchanged (seed 42 still exactly 0.15), even though the model is
+much more confident overall: average confidence on correct answers rose from
+about 0.47 to about 0.74. I didn't tune epochs any further. Trying many
+values and keeping the best would mean tuning on the test set.
+
+*Caveat:* this is a stretch run on top of the improvement, not part of it.
+The "after" Run Log above is still the official improvement result. The
+8-epoch run shows what the remaining training headroom was.
+
+**Not attempted: a fourth label.** My three labels already split on the
+`technique`/`opinion` boundary, so a fourth label would have added another
+boundary before the existing one was learned.
 
 <!-- ═════════════════════════════════════════════════════════════════════
 
