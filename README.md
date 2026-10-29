@@ -153,6 +153,10 @@ More rules I applied every time:
 <!-- Where you collected from, how you labelled, your counts, and three hard
      cases. -->
 
+> **This section describes the original 200-row dataset** that the unit 5
+> training run and the "before" results used. As part of the improvement in
+> unit 6, it was expanded to 400 rows. See [The Improvement](#the-improvement).
+
 **Where the posts came from:** Public comments from 12 r/Cooking threads,
 saved on 22 October 2026 and extracted with `extract_comments.py` (at most 30
 comments per thread). The threads mix question posts ("Why is cooked celery
@@ -230,6 +234,10 @@ anywhere.
 
 <!-- Your starting model, your settings, and anything you changed and why. -->
 
+> **This section describes the unit 5 run on the original 200 rows.** The
+> settings stay the same for the improvement run. The 400-row split sizes are
+> in [The Improvement](#the-improvement).
+
 **Base model:** `distilbert-base-uncased`
 
 **Settings:** <!-- epochs, learning rate, batch size, seed -->
@@ -238,8 +246,11 @@ Trained on an Apple Silicon GPU (MPS), torch 2.14.1.
 
 **Anything I changed from the defaults, and why:** Only `LABELS`, set to my
 three labels. The training settings are the defaults. Max length stayed at
-128 because I removed every comment over 100 words while building the
-dataset, so nothing gets truncated.
+128. I measured every comment with the `distilbert-base-uncased` tokenizer:
+the longest is 124 tokens including the special tokens, so nothing gets
+truncated. That holds for the 400-row dataset as well. (An earlier version of
+this line said that removing comments over 100 words guaranteed this, but a
+word count can't prove it. The tokenizer measurement does.)
 
 **Split sizes:** <!-- train / val / test, and per-label counts in the test
 split. If a label had fewer than about 8 in test, say so — it explains a lot
@@ -446,15 +457,25 @@ disagreement was on `technique` vs `opinion`. That gap between 100% on a
 well-written rule and about 79% on mine is what separates a labelling problem
 from a model problem in the diagnoses below.
 
+What the agreement report can't tell me about is training. It says nothing
+about whether the model got enough training to learn the labels. Where it rules
+out labelling, the cause is on the model side, and on that side the clearest
+problem is how little training the model got. With 139 training examples and
+batch size 16, each epoch is only 9 steps, so 3 epochs is 27 steps in total,
+at a learning rate of 2e-5. That's very little for a model to move away from
+guessing the most common label.
+
 **Criteria 1 and 2 (accuracy, `technique` F1): a model that can't reach a
 stable answer from this much data.** Both missed only because of seed 7, which
 predicted `technique` for 29 of 30 posts. Its scores (0.467 accuracy, 0.619
 `technique` F1) are what you'd get by guessing the biggest label almost every
 time. This isn't a labelling problem: the labels are identical in every seed,
 and on seeds 42 and 2024 the same data trained a model that separates
-`technique` from `reaction` well (F1 around 0.72 and 0.76–0.78). With 139
-training examples and 3 epochs, one unlucky split was enough for training to
-settle on "say `technique`" instead of learning the labels.
+`technique` from `reaction` well (F1 around 0.72 and 0.76–0.78). The cause is
+undertraining: 27 training steps in total (see above). That's few enough
+that the outcome depends on the split. Two seeds got far enough to learn the
+labels; seed 7 never moved past "say `technique`," which is where an
+undertrained model starts.
 
 **Criterion 3 (every label F1): too few examples, on a boundary I didn't apply
 consistently.** `opinion` scored 0.000 in every seed. The model never predicted
@@ -552,9 +573,83 @@ with tight rules helping.
 
 ## The Improvement
 
-**What I changed:**
+**What I changed:** I added examples to my thinnest label. `opinion`, the
+label with the worst F1 (0.000 in every seed), went from 41 examples to 131,
+and the dataset grew from 200 to 400 rows with the three labels balanced.
+Everything below is part of this improvement. The Unit 5 sections above still
+describe the original 200 rows.
 
-**Which diagnosis pointed at it:**
+*Where the new rows came from.* I saved two opinion-heavy r/Cooking threads,
+"Your ACTUAL unpopular food opinion" and "What is your favorite dish that
+others hate". I also used comments from the original 12 threads that were
+never extracted (the first pass took at most 30 per thread) or were trimmed
+earlier only to reduce the count. Across 14 threads there were 1,069
+comments. New rows follow the same rules as the first batch: at most 100
+words, and no link-only posts, context-only replies, trivia, health claims,
+side arguments, or food-etiquette debates.
+
+*How they were labelled and checked.* Claude labelled the new comments.
+ChatGPT then reviewed the whole 400-row file twice. Its first review found
+6 clear errors, 3 story-with-a-tip rows, and 14 context, trivia, or
+etiquette rows in the new batch. It also flagged 11 rows in the original 200
+that broke my own drop rules. I decided every change: 8 rows relabelled
+`technique`, 15 new rows dropped, and the 11 original rows dropped. Claude
+then labelled 26 replacements, and ChatGPT's second review checked them. I
+decided its 4 disputed rows: 263 → `reaction`, 384 → `technique`, and 372
+and 392 kept. I did not personally re-read every one of the 211 new rows.
+The labels I didn't individually check are ones Claude assigned and
+ChatGPT's review did not dispute.
+
+*Final dataset.* 189 of the original 200 rows were kept and 211 are new.
+
+| Label | Before (200 rows) | After (400 rows) |
+|---|---|---|
+| `technique` | 85 | 134 |
+| `reaction` | 74 | 135 |
+| `opinion` | 41 | 131 |
+
+Seed-42 split of the 400 rows (train / val / test): 279 / 61 / 60. `opinion`
+now has 20 test examples instead of 6, so its F1 should jump around much
+less between seeds.
+
+*Rules made explicit during the improvement.* Reviewing the new batch
+exposed boundaries the original rules didn't settle. These were applied to
+the new rows:
+
+- **Praising a combination vs. teaching one.** "I love liverwurst with red
+  onions and mustard… it just hits" is `opinion`. Telling someone how to make
+  or change a dish ("reconstituted and chopped into small bits or blended")
+  is `technique`. A food or ingredient name alone doesn't decide the label.
+- **Preference vs. personal story.** If the comment is mainly a preference,
+  it's `opinion`. If it's mainly a story ("My mom always kept liverwurst in
+  the fridge when I was growing up…"), it's `reaction`, even when it mentions
+  a combination.
+- **Clearly implied corrections count as `technique`.** "Until recently I
+  crushed garlic after I peeled it" and "Never salted pasta water for years.
+  Bland noodles." teach a fix without stating it.
+- **Jokes stay `reaction` unless there's a sincere, usable tip inside.** This
+  replaces the blanket humour rule above, which conflicted with hard case 1
+  (the chili joke I labelled `technique`).
+- **Judging someone else's suggestion is `reaction`.** "That sounds
+  unnecessarily complicated/messy" responds to another comment rather than
+  saying something about food in general.
+
+*What this changes about the comparison.* Adding rows changes which posts
+land in every split. The "after" test splits contain 60 posts, not 30, and
+mostly different ones. Before and after are scored on different posts, so
+the comparison is between two datasets, not two models on the same data.
+
+*Limitation.* 81 of the new `opinion` rows come from the two opinion threads.
+The model may partly learn "sounds like those threads" rather than "is an
+opinion".
+
+**Which diagnosis pointed at it:** Criterion 3. `opinion` scored 0.000 F1 in
+all three seeds, and the diagnosis named too few examples first: 29 in
+training and 6 in test. The model never predicted `opinion` at all. More
+examples is the direct fix for that diagnosis. The extra rows also add
+training steps per epoch (about 18 instead of 9), which partly addresses the
+undertraining behind criteria 1 and 2. The epoch setting itself was not
+changed.
 
 ### Run Log — After
 
