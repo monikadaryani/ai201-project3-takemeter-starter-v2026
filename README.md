@@ -310,14 +310,51 @@ is why criterion 3 sets a looser target for it.
   chili-on-noodles defence → `opinion`, where both models said
   `technique`).
 
-**Pre-labelling disclosure:** Claude pre-labelled all the comments, and
+**Moment 3 (unit 6): choosing the improvement**
+
+- *What I asked for:* Which single improvement would do the most to meet my
+  criteria.
+- *What came back:* Claude first recommended training longer (3 → 10
+  epochs). Its reasoning: 139 training examples at batch size 16 is only 27
+  training steps, and seed 7's collapse looked like undertraining. I asked
+  whether more data would beat that, and about changing the learning rate.
+  Claude compared the three: epochs were the cheapest and cleanest
+  experiment; a higher learning rate risked making the seed-to-seed swings
+  worse; more `opinion` examples were the stronger fix for `opinion` but
+  more work. Once I shared the course's three improvement options, it
+  switched to recommending about 30 more `opinion` examples, because that
+  matched my diagnosis for criterion 3.
+- *What I changed:* I went further than either suggestion. Instead of 30
+  `opinion` rows, I saved two opinion-heavy threads and doubled the dataset
+  to 400 rows with the three labels balanced, also bringing back comments
+  that had been trimmed earlier. I kept epochs and learning rate unchanged,
+  so the improvement stayed data-only and the before/after comparison
+  measures that one change.
+
+**Pre-labelling disclosure:**
+
+*Unit 5 (the original 200 rows).* Claude pre-labelled all the comments, and
 ChatGPT reviewed every label. I personally decided 52 rows: every row where
 the two models disagreed, every row ChatGPT held back, 4 rows added back
 late, and a few I checked at the start. The other 148 rows carry labels that
 both models agreed on, and I did not re-read each of those individually.
-Claude also wrote `extract_comments.py`, and helped draft the README and
-`criteria.md`. In unit 6, Claude also labelled the 30 staff posts for the
-agreement check (see the Agreement Report).
+
+*Unit 6 (the improvement, 211 new rows).* Claude labelled every new comment.
+ChatGPT reviewed the full 400-row file twice. I decided every change those
+reviews raised: 8 relabels, 26 drops (including 11 from the original 200),
+and the 4 disputed rows in the second review. I did not personally re-read
+every new row. The ones I didn't check carry labels Claude assigned that
+ChatGPT's review did not dispute.
+
+*Staff agreement set.* Claude labelled the 30 staff posts, not me, so the
+100% agreement rate measures Claude (see the Agreement Report).
+
+*Other AI help.* Claude wrote `extract_comments.py`, ran the baseline
+script, and drafted most of this README and `criteria.md` from my decisions
+and the result files: the Run Logs, diagnoses, the Improvement write-up, and
+What's Still Broken. I reviewed and directed those drafts. The labelling
+decisions listed above, the choice of community, the choice of improvement,
+and the calls on disputed rows were mine.
 
 <!-- ═══════════════════════ UNIT 6 — THE TEST ═══════════════════════
 
@@ -359,6 +396,10 @@ there. The big change will be `opinion`: the baseline never got one right
 0.45**, because it has only 29 training examples and 6 test examples. If the
 trained model only ties the baseline overall, the gain will come almost
 entirely from `opinion`.
+
+> **Note:** When I wrote this, my Baseline column mistakenly held the trained
+> seed-42 numbers, so the figures above are trained results, not the baseline
+> (real baseline: 0.467 accuracy).
 
 **What the gap actually means:**
 <!-- If the baseline matched your trained model, your fine-tuning added
@@ -576,10 +617,11 @@ with tight rules helping.
 
 ## The Improvement
 
-**What I changed:** I added examples to my thinnest label. `opinion`, the
-label with the worst F1 (0.000 in every seed), went from 41 examples to 131,
-and the dataset grew from 200 to 400 rows with the three labels balanced.
-Everything below is part of this improvement. The Unit 5 sections above still
+**What I changed:** I added more data and balanced the labels. The dataset
+doubled from 200 to 400 rows, and the three labels went from lopsided (85
+`technique`, 74 `reaction`, 41 `opinion`) to roughly equal (134 / 135 / 131).
+Most of the new rows went to the thinnest label, `opinion` (41 → 131), but
+every label grew. Everything below is part of this improvement. The Unit 5 sections above still
 describe the original 200 rows.
 
 *Where the new rows came from.* I saved two opinion-heavy r/Cooking threads,
@@ -646,13 +688,21 @@ the comparison is between two datasets, not two models on the same data.
 The model may partly learn "sounds like those threads" rather than "is an
 opinion".
 
-**Which diagnosis pointed at it:** Criterion 3. `opinion` scored 0.000 F1 in
-all three seeds, and the diagnosis named too few examples first: 29 in
-training and 6 in test. The model never predicted `opinion` at all. More
-examples is the direct fix for that diagnosis. The extra rows also add
-training steps per epoch (about 18 instead of 9), which partly addresses the
-undertraining behind criteria 1 and 2. The epoch setting itself was not
-changed.
+**Which diagnosis pointed at it:** All three of the "before" diagnoses point
+at too little, lopsided data:
+
+- **Criteria 1 and 2 (accuracy, `technique` F1):** the diagnosis was a model
+  that can't reach a stable answer from this much data. Seed 7 collapsed into
+  calling 29 of 30 posts `technique`, the biggest label. Doubling the data
+  gives the model twice as many examples, and twice the training steps per
+  epoch (about 18 instead of 9) at the same settings. Balancing takes away
+  the "guess the biggest label" shortcut that the collapsed seed fell into.
+- **Criterion 3 (every label F1):** `opinion` scored 0.000 in all three seeds,
+  and the diagnosis named too few examples first: 29 in training and 6 in
+  test. Balancing gives it as many examples as the other labels.
+
+The training settings (epochs, learning rate, batch size) were not changed.
+That keeps this a data-only improvement.
 
 ### Run Log — After
 
@@ -697,7 +747,7 @@ staff check doesn't depend on my data. Criterion 5's seed-42 gap is exactly
 **Partly. It fixed what it was aimed at, but it didn't get any missed
 criterion over the line except criterion 5, and overall accuracy went down.**
 
-- **`opinion` came off zero, which is what the change was for.** F1 went from
+- **`opinion` came off zero, which balancing was meant to do.** F1 went from
   0.000 in every seed to 0.35–0.40. The model now predicts `opinion` at all
   (7, 15 and 9 times across the three seeds, against 0 before). That's still
   under criterion 3's 0.45, so the criterion is still missed. This matches my
@@ -759,12 +809,55 @@ label; it hasn't yet learned the boundary.
 
 <!-- For each criterion still missed: what you'd do, and why you stopped. -->
 
+Three criteria are still missed after the improvement. I made one change on
+purpose: more data, balanced across the labels. With a single change, the
+before/after
+comparison says what that change did. Each fix below would be a second change,
+and running them together would make it impossible to tell which one helped.
 
+**Criterion 1: overall accuracy (0.583 / 0.600 / 0.617, target 0.65).**
+*What I'd do:* train longer, raising `EPOCHS` from 3 to about 8 while
+watching the validation score each epoch for overfitting. The diagnosis for
+this criterion was undertraining. The extra rows doubled the steps per epoch
+(9 → 18), but 3 epochs is still only about 54 training steps. *Why I
+stopped:* it's a training change, and I'd already changed the data in this
+round. Doing both at once would make it impossible to say what moved the
+numbers.
+
+**Criterion 2: F1 on `technique` (0.622 / 0.750 / 0.756, target 0.70).**
+Only seed 42 missed. In that seed, 6 of 20 real `technique` comments were
+called `reaction`. These are tips told as stories ("Never salted pasta water
+for years. Bland noodles."), which my "a usable tip wins" rule labels
+`technique` but which read like personal stories. *What I'd do:* add more
+story-shaped tips to training, so the model sees that a story can still
+teach. More epochs would likely help as well. *Why I stopped:* same as above.
+It's another data change on top of the one being measured.
+
+**Criterion 3: every label F1 at least 0.45 (`opinion` 0.370 / 0.400 /
+0.345).** More examples got `opinion` off zero, but not to the target. The
+strongest clue is the baseline: the zero-shot model scored 0.457 on
+`opinion` given only the word "opinion," but 0.174 given my definition. My
+definition is harder to apply than the plain word. *What I'd do:* rewrite
+the `opinion` definition around what the model gets wrong: "a judgment
+about a food or dish, even when it names ingredients." Then relabel the
+`opinion`/`technique` boundary under the reworded rule, and add opinions from
+more varied threads. 81 of the new opinions came from just two threads, so the
+model may have learned those threads' style rather than the label. *Why I
+stopped:* rewording the definition means relabelling and reviewing the
+boundary again. That's a bigger job than the one improvement this unit asks
+for, and it's the next step.
 
 **The gap between what I meant my labels to capture and what the model
 learned:**
 <!-- Two sentences. Your confusion matrix is the evidence. -->
-
+I meant `opinion` to capture any judgment about food and `technique` anything
+that teaches, but the model learned surface cues instead: in seed 42, 9 of 20
+real opinions were called `technique` because they name dishes and
+ingredients, and 6 were called `reaction` because they're written in the
+first person. The same cue works the other way too, with 6 of 20 tips told
+as stories called `reaction`, so the model learned what a comment *sounds*
+like (food words → `technique`, "I" and "my" → `reaction`), not whether it
+teaches, judges, or reacts.
 
 
 <!-- ═════════════════════════════════════════════════════════════════════
