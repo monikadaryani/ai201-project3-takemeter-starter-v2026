@@ -1,88 +1,68 @@
 {
   "model": "facebook/bart-large-mnli",
-  "n": 30,
+  "n": 60,
   "seed": 42,
   "held_out": true,
   "used_definitions": true,
   "scores": {
-    "n": 30,
-    "accuracy": 0.4666666666666667,
-    "f1_macro": 0.2619047619047619,
+    "n": 60,
+    "accuracy": 0.38333333333333336,
+    "f1_macro": 0.28746596398770313,
     "per_label": {
       "opinion": {
-        "precision": 0.0,
-        "recall": 0.0,
-        "f1": 0.0,
-        "support": 6
+        "precision": 0.6666666666666666,
+        "recall": 0.1,
+        "f1": 0.1739130434782609,
+        "support": 20
       },
       "reaction": {
         "precision": 1.0,
-        "recall": 0.09090909090909091,
-        "f1": 0.16666666666666669,
-        "support": 11
+        "recall": 0.1,
+        "f1": 0.18181818181818182,
+        "support": 20
       },
       "technique": {
-        "precision": 0.4482758620689655,
-        "recall": 1.0,
-        "f1": 0.6190476190476191,
-        "support": 13
+        "precision": 0.34545454545454546,
+        "recall": 0.95,
+        "f1": 0.5066666666666667,
+        "support": 20
       }
     }
   },
   "predictions": [
     {
-      "text": "Thank you, I appreciate this tip!",
+      "text": "The no onion one is the one that drives me totally up the wall, and somehow I've had three separate guests with it in the last year. Onions are in most food.",
       "gold": "reaction",
       "predicted": "technique"
     },
     {
-      "text": "Second this! My mom makes an amazing trifle that always disappears.\n\nSara Lee Pound cake, cut into cubes Raspberry dessert syrup (look for it with the maple syrups or ice cream toppings) Cool Whip mixed with a package of prepared Jello Instant vanilla pudding Layer all of the above with sliced fresh fruit of your choice (my mom does strawberries and kiwi for Christmas) Top with Cool Whip",
-      "gold": "technique",
-      "predicted": "technique"
-    },
-    {
-      "text": "All I know is airfryers don't do well with battered food. I've tried a couple of times with bad results. Considering all the oil they want you to use, you might as well pan fry.",
-      "gold": "opinion",
-      "predicted": "technique"
-    },
-    {
-      "text": "The sauce is essentially a 1:1 combination of gorgonzola and mascarpone with some pasta water to loosen it up and topped with some crispy prosciutto. Usually with a long noodle, although that doesn't really matter.\n\nBack in college a friend from Italy made it for me once when I was sick, and he said his Nona used to make it for him when he was ill. I've loved it ever since.",
-      "gold": "technique",
-      "predicted": "technique"
-    },
-    {
-      "text": "Yes but also cooking the bacon in the oven is the real answer. Also I learned recently that cooking the bacon in a sheet pan with another tray on top and parchment in between will get you the flattest, restaurant worthy bacon around.",
-      "gold": "technique",
-      "predicted": "technique"
-    },
-    {
-      "text": "I still remember the times I\u2019ve found caterpillars. I\u2019ve never bitten into one without cutting it open since.",
+      "text": "Ah crap, I forgot the German kid hates tomatoes too.",
       "gold": "reaction",
       "predicted": "technique"
     },
     {
-      "text": "My pasta comfort dish is tuna mac. I\u2019ve seen a lot of people on here say they do it with Mac n cheese, but growing up my mom used elbow macaroni. Then you add a can of tuna, mayonnaise, peas, and seasonings. Peas are a must, obviously you can add more veg but to me it\u2019s not a real tuna mac without peas.",
-      "gold": "technique",
+      "text": "honestly, why did i never think of this? I've been making such a simple task harder than it needs to be.",
+      "gold": "reaction",
       "predicted": "technique"
     },
     {
-      "text": "Use a bench scraper! I'm so mad at myself for not tbinking of this until a few months ago.",
-      "gold": "technique",
+      "text": "Yeah. It's Pittsburgh plus the surrounding areas into central PA, northern WV, and eastern Ohio. I always enjoy getting to make cookie table cookies for weddings.",
+      "gold": "reaction",
       "predicted": "technique"
     },
     {
-      "text": "Yep. Chilis ironically make really good chili",
-      "gold": "technique",
+      "text": "Any kind of dark beer? I think I make pretty good chilli haven\u2019t tried this before",
+      "gold": "reaction",
       "predicted": "technique"
     },
     {
-      "text": "Cannoli dip\n\nI've seen premade at both Aldi and Wegmans grocery stores. But you can make yourself as well.\n\nBuy or make the shells and break them into \"chip size\" pieces.\n\nPeople can sample a little or a lot, and you don't need to do all of the extra work of filling shells and trying to figure out how many to make.",
-      "gold": "technique",
+      "text": "All good. Had pig nose in China often--delicious too, duck heads, necks---grew to like it.",
+      "gold": "reaction",
       "predicted": "technique"
     },
     {
-      "text": "Sounds yummy. Mine is Chef John's Best Baked Ziti. It's easy, and best of all, it never comes out dry. It's a great recipe. In fact, I'm making it for dinner tonight (by request!), along with Ligurian Focaccia bread from Salt Fat Acid Heat. https://www.allrecipes.com/recipe/281646/the-best-baked-ziti/\n\nedited for clarity",
-      "gold": "opinion",
+      "text": "Splash of fish sauce, soy sauce, and/or Worcestershire sauce goes a long way. I also think adding a splash of vodka or whiskey at the end opens the flavors up a lot. Don\u2019t forget about the toppings or things you can serve with it. I love serving it on a baked potato but cornbread or Fritos are also great. Add some combo of cilantro, extra onions, avocado, cheese, sour cream, hot sauce, it\u2019ll be great.",
+      "gold": "technique",
       "predicted": "technique"
     },
     {
@@ -91,27 +71,187 @@
       "predicted": "reaction"
     },
     {
-      "text": "Ground coffee will also do the trick.",
+      "text": "I hate bow shaped pasta! It pisses me off! It\u2019s so stupid! There I said it! God I feel so good now, I\u2019m off for a swim with my new found ability to breath after I got that off my chest!",
+      "gold": "opinion",
+      "predicted": "opinion"
+    },
+    {
+      "text": "In college, I finally learned that you don't cook everything on high.",
       "gold": "technique",
       "predicted": "technique"
     },
     {
-      "text": "It was approaching $7 a bunch last winter, off season I still consider it an expensive item.",
+      "text": "I prefer boneless chicken wings. They\u2019re just easier to eat.",
       "gold": "opinion",
       "predicted": "technique"
     },
     {
-      "text": "And that Janice used it to manipulate Bobby.",
-      "gold": "reaction",
-      "predicted": "technique"
-    },
-    {
-      "text": "It\u2019s likely that your midwestern spice allergy will translate well to a German: they\u2019re not exactly known for spicy food either.\n\nThat said, I\u2019d consider replacing a portion of your ground beef for ground sausage. I like chorizo, but you can use any sausage you like that isn\u2019t \u201ckinky\u201d (like with apples in it or something)",
+      "text": "I actually like fruitcake. You just have to heat it up.",
       "gold": "technique",
       "predicted": "technique"
     },
     {
-      "text": "Yes. I learned how to cook for a household of 6 that often had 7-8 for dinner. My default recipes were way too big for my 2 person family.",
+      "text": "I'm a hot fudge person. Nothing better than a hot fudge malt.",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "I love livers but lots of people seem to find it yucky. Which is bizarre to me since it's such a basic piece of meat",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "I do something like this and add sesame paste (no gjnger) and noodles, and usually some Asian bbq pork that I make on big batches and freeze. Sometimes a little sweet chili sauce.",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "Good tip, but 5 degrees barely accounts for carryover temp rise. 10 to 15 degrees is more accurate. This is a good article on why it can be safe to cook chicken to 150 if done correctly.",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "Do you also happen to taste an almost \"prune\" taste in chocolate syrups?\n\nPlease tell me I'm not crazy",
+      "gold": "reaction",
+      "predicted": "technique"
+    },
+    {
+      "text": "I regularly make a popcorn chicken that is not bone-in but a similar process to the recipe. It comes out a little on the dry side but pretty darn close to fried.\n\nJust to confirm, did you put it in, set it for 30 minutes, and walk away until the timer went off? Any batch I've made was done well before 20 minutes was up, though the pieces are of course much smaller.",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "Cake balls! Everyone loves them.",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "Yeah this sounds way better (sorry Piccadilly\u2019s mom!) and not much harder at all",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "When you sautee them, before you add any fat to the pan, add about a 1/4 cup of water, it will make them release their water faster since that water will boil and steam them heating them up faster. Don't add fat/oil to the pan until you see the water almost gone. (learned from watching Alton Brown)",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "Lmao I love people who cook, we\u2019re always like \u201cbro it only took me 5 hours total and I was even allowed to walk away for parts of it\u201d\n\nI was just telling my fianc\u00e9e how easy the coq au vin was, and how excited I was that it only took a couple hours to \u201cthrow it together\u201d",
+      "gold": "reaction",
+      "predicted": "reaction"
+    },
+    {
+      "text": "Chump versions of foods have their place, imo. Companies put millions of dollars into R&D and, overall, it works. The blue box of Mac and cheese tastes like childhood comfort food, as does microwave popcorn, as do many other things that technically aren't as good as the real thing, but they serve their purpose",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "Liver and onions.\n\nI grew up eating it and I loved it. I assumed everyone ate it at home.\n\nWhen I tell other people I like liver almost everyone turns green around the gills.\n\nSimilarly, I also grew up eating liverwurst, and love it too. A friend came over the other day. We had some and set out with some other charcuterie. He said he didn't think he liked it. But he tried some. Ended up eating a whole stack with crackers \ud83e\udd23\ud83e\udd23\ud83e\udd23.\n\nI think most people would like liver if they got out of their own heads.",
+      "gold": "reaction",
+      "predicted": "technique"
+    },
+    {
+      "text": "So many beginner cooks act like bell peppers are the bane of their existence and I just don\u2019t understand at all.",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "So much rich food. A good real key lime pie. Rich but the citrus is refreshing",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "Dry your meat before searing it.",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "I push the stem in and pull it out. Most of the seeds come with it. Then I pull out the pith, then chop",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "Truffle flavour ruins food. Truffle fries, truffle oil on pizza. It\u2019s supposed to be fancy and elevate meals but truffle anything tastes worse than without truffle.\n\nAlso totally agree about pickles.",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "Rice crispy treats are a blank canvas. Add almost anything. A package of runts was my kids fave.",
+      "gold": "technique",
+      "predicted": "opinion"
+    },
+    {
+      "text": "I just smash them flat with my hand, pull off the stem, and shake out the seeds.",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "our family gatherings were always buffet style so people always found something they enjoyed. my mom cooked most of it but is was also a potluck so everyone shares in the love/pain of cooking lol",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "Pancetta , Guianchale and most forms of bacon are best and render better when cooked starting on a cold pan rather than a preheated one.\n\nChicken doesn\u2019t have to be cremated to be safe.\n\nGarlic doesn\u2019t go in the bolognese",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "100%. It is IMPOSSIBLE to cook it properly. If the wings are al dente, the center mass is unpleasantly tough and chewy. If the center is cooked, the rest is floppy mush. Why does such a ridiculous pasta shape exist ?!??",
+      "gold": "opinion",
+      "predicted": "opinion"
+    },
+    {
+      "text": "Listen, I'll take a lot of tips but if I want to top noodles with chili and parmesan and make God's finest Midwestern comfort creation I will lol. Its okay to fear what you don't understand!\n\nNot with this recipe, but standard Midwest chili? You betcha.",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "Buy frozen cauliflower, those are already cut into florets! :-)",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "I won a chili cookoff and everyone asked what my secret ingredient is- whiskey! Also add some brown sugar and a bit of molasses, and use some fresh peppers, not just powder. I use jalape\u00f1o, diced roasted green chilies, and Chipotle in adobo sauce.",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "I love love love candy corn.",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "I'm amused at the idea that he's holding her back. Like \"No woman! Do not share the sacred tenderizing secrets!\" :D",
+      "gold": "reaction",
+      "predicted": "technique"
+    },
+    {
+      "text": "I love grating fresh parm for most dishes but sometimes that chump Kraft stuff just hits the spot.",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "And leaving it the fuck alone.\n\nActually that's probably my tip for everything; leave it the fuck alone. Don't crowd and let it sit way longer than the voice in your head is trying to tell you to leave it; it's fine and trust your timing heh\n\nBetter to char something to than to steam it or undersear",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "For me it's coffee grounds. If any dish with coffee grounds makes it into the dishwasher, 7 things are coming out of the dishwasher with coffee grounds on them. It's a virus",
+      "gold": "reaction",
+      "predicted": "technique"
+    },
+    {
+      "text": "Every meal I cook is without a recipe in front of me.",
+      "gold": "reaction",
+      "predicted": "technique"
+    },
+    {
+      "text": "Refusing to carefully measure is why I will never master baking.\n\nCooking is from the heart but baking is from the brain.",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "I use truffle oil when I fucked up a dish because then it'll be all you can taste \ud83d\udc80",
       "gold": "reaction",
       "predicted": "technique"
     },
@@ -121,63 +261,73 @@
       "predicted": "technique"
     },
     {
-      "text": "Listen, I'll take a lot of tips but if I want to top noodles with chili and parmesan and make God's finest Midwestern comfort creation I will lol. Its okay to fear what you don't understand!\n\nNot with this recipe, but standard Midwest chili? You betcha.",
+      "text": "This was the first time I\u2019ve ever made a beef roast and it was soooo simple. It was like an hour to get it in the oven. Go play pickleball while it cooked. Maybe another hour to do the mashers and break up the roast, taking a shower while that was happening. It was a two pan meal and would have been one pan if I owned a real Dutch oven.",
+      "gold": "reaction",
+      "predicted": "technique"
+    },
+    {
+      "text": "Not every dish is improved by a block of cream cheese. Looking at you, TikTok cooks.",
       "gold": "opinion",
       "predicted": "technique"
     },
     {
-      "text": "The no onion one is the one that drives me totally up the wall, and somehow I've had three separate guests with it in the last year. Onions are in most food.",
-      "gold": "reaction",
-      "predicted": "technique"
-    },
-    {
-      "text": "I rarely use the times reccomended by recipes. They always end up burnt. If a recipe calls for 390 for 12-14 minutes, I will usually do 365 for 10 min and it comes out perfect.",
-      "gold": "technique",
-      "predicted": "technique"
-    },
-    {
-      "text": "These sound delicious!!",
-      "gold": "reaction",
-      "predicted": "technique"
-    },
-    {
-      "text": "This date cake is also killer, good with plain whipped cream. Don\u2019t skip the caramel. https://www.yahoo.com/news/cake-of-the-day-warm-date-cake-with-ginger-gelato-200811442.html",
-      "gold": "technique",
-      "predicted": "technique"
-    },
-    {
-      "text": "Sweetened chili seems to be a midwestern thing. When I lived up in Indiana (I'm from Kentucky) an acquaintance from over in Illinois wanted me to try his chili. It was basically ground beef with a bunch of sugar in it. Definitely NOT what I was expecting, for sure.",
-      "gold": "reaction",
-      "predicted": "technique"
-    },
-    {
-      "text": "omg yes why do the tiniest onion skins turn into the biggest kitchen nightmare",
-      "gold": "reaction",
-      "predicted": "technique"
-    },
-    {
-      "text": "I've only played with velveting a little because it leaves an almost fishy flavor for me. Its probably my inexperience, I may have been too heavy handed or left it for too long.\n\nOn the list to take another shot at, for sure.",
-      "gold": "reaction",
-      "predicted": "technique"
-    },
-    {
-      "text": "I'm not gonna lie, I'm probably in the minority, but I prefer ground beef to something like chuck roast. I'm not sure why it is, but it is",
+      "text": "There should be enough garnish on a dish to have some in every single bite.",
       "gold": "opinion",
       "predicted": "technique"
     },
     {
-      "text": "Cut in half. Remove cores by hand. Tap the rest of the seeds out directly into garbage.",
-      "gold": "technique",
-      "predicted": "technique"
-    },
-    {
-      "text": "That sounds delicious!",
+      "text": "Is flat bacon a goal people have?",
       "gold": "reaction",
       "predicted": "technique"
     },
     {
-      "text": "Yeah this sounds way better (sorry Piccadilly\u2019s mom!) and not much harder at all",
+      "text": "Salt brings food alive.",
       "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "Cannoli dip\n\nI've seen premade at both Aldi and Wegmans grocery stores. But you can make yourself as well.\n\nBuy or make the shells and break them into \"chip size\" pieces.\n\nPeople can sample a little or a lot, and you don't need to do all of the extra work of filling shells and trying to figure out how many to make.",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "There was a restaurant that served something called pasta recco. It was a spicy tomato based sauce that was a bit creamy, I swear it had cinnamon in it. The place closed years ago and I\u2019ve been trying to find a similar recipe. Apparently it\u2019s South African. I haven\u2019t found an online recipe that comes close.",
+      "gold": "reaction",
+      "predicted": "technique"
+    },
+    {
+      "text": "Measuring with your heart is the only way.",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "Muffins are just bald cupcakes.\n\nEdit: Source Jim Gaffigan",
+      "gold": "reaction",
+      "predicted": "technique"
+    },
+    {
+      "text": "I started to cook every day after I retired. I learned that a steel skillet is the best. From fried eggs to steaks nothing sticks if a little oil is applied with a paper towel. Easy to clean and not as heavy as cast iron. \ud83d\udd96",
+      "gold": "technique",
+      "predicted": "technique"
+    },
+    {
+      "text": "For me it's the little bits of broccoli that fall off the tops. They're so hard to sweep up off the table, they just bounce around everywhere",
+      "gold": "reaction",
+      "predicted": "technique"
+    },
+    {
+      "text": "You still haven't bought the broccoli catcher x-treme? You're clearly still living in 1944.",
+      "gold": "reaction",
+      "predicted": "technique"
+    },
+    {
+      "text": "I don\u2019t follow recipes much at all. Little bit of this, little bit of that.\n\nIf you know the techniques and what flavours go you can whip up a delicious dinner, easy peasy.",
+      "gold": "opinion",
+      "predicted": "technique"
+    },
+    {
+      "text": "I\u2019ve done this once - celery braised in beef stock. It was delicious!",
+      "gold": "technique",
       "predicted": "technique"
     }
   ]

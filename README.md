@@ -341,8 +341,11 @@ agreement check (see the Agreement Report).
 
 Baseline is `facebook/bart-large-mnli` zero-shot with `label_definitions.txt`;
 Baseline-names-only is the same model given only the three label names.
-Trained is seed 42 (`results.json`). Difference is Trained minus Baseline. All
-three are scored on the same 30 held-out posts.
+Trained is seed 42. Difference is Trained minus Baseline. All three are scored
+on the same 30 held-out posts from the original 200-row dataset. These files
+are kept as `baseline_results_before.json`, `baseline_names_only_before.json`,
+`results_before.json` and `test_split_before.csv`. The same comparison on the
+400-row dataset is in [The Improvement](#the-improvement).
 
 **What I predicted before I looked:**
 <!-- Milestone 1 asks you to write this BEFORE seeing the trained numbers. A
@@ -655,16 +658,98 @@ changed.
 
 | Criterion | Target | Seed 42 | Seed 7 | Seed 2024 | Verdict |
 |---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |
+| 1. Overall accuracy | ≥ 0.65 | 0.583 | 0.600 | 0.617 | MISSED |
+| 2. F1 on `technique` | ≥ 0.70 | 0.622 | 0.750 | 0.756 | MISSED |
+| 3. Every label F1 | ≥ 0.45 | 0.370 | 0.400 | 0.345 | MISSED |
+| 4. Agreement with staff labels | ≥ 80% | 100% | 100% | 100% | MET |
+| 5. Confidence gap (most-sure third minus least-sure third) | ≥ 0.15 | 0.15 | 0.45 | 0.20 | MET |
+
+Notes: 400 rows, 60 test posts per seed (20 per label). Criterion 3's lowest
+label is `opinion` in every seed. Criterion 4 wasn't re-measured, since the
+staff check doesn't depend on my data. Criterion 5's seed-42 gap is exactly
+0.15 (14/20 − 11/20), which meets "at least 0.15" with nothing to spare.
+
+**Confusion matrix after (seed 42, 60 held-out posts)**
+
+| true \ predicted | opinion | technique | reaction |
+|---|---|---|---|
+| **opinion** | 5 | 9 | 6 |
+| **technique** | 0 | 14 | 6 |
+| **reaction** | 2 | 2 | 16 |
+
+**Before and after, side by side**
+
+| Criterion | Target | Before (42 / 7 / 2024) | Before | After (42 / 7 / 2024) | After |
+|---|---|---|---|---|---|
+| 1. Overall accuracy | ≥ 0.65 | 0.667 / 0.467 / 0.667 | MISSED | 0.583 / 0.600 / 0.617 | MISSED |
+| 2. F1 on `technique` | ≥ 0.70 | 0.727 / 0.619 / 0.722 | MISSED | 0.622 / 0.750 / 0.756 | MISSED |
+| 3. Every label F1 | ≥ 0.45 | 0.000 / 0.000 / 0.000 | MISSED | 0.370 / 0.400 / 0.345 | MISSED |
+| 4. Staff agreement | ≥ 80% | 100% | MET | 100% | MET |
+| 5. Confidence gap | ≥ 0.15 | 0.10 / 0.40 / 0.30 | MISSED | 0.15 / 0.45 / 0.20 | MET |
+| *Macro F1 (not a criterion)* | | 0.496 / 0.262 / 0.500 | | 0.553 / 0.582 / 0.584 | |
+| *Accuracy spread across seeds* | | 0.200 | | 0.034 | |
 
 **Did it help, and how do I know:**
 
 <!-- If it didn't, say so. Relabelling that didn't help is a genuinely
      interesting result and earns full credit. -->
+
+**Partly. It fixed what it was aimed at, but it didn't get any missed
+criterion over the line except criterion 5, and overall accuracy went down.**
+
+- **`opinion` came off zero, which is what the change was for.** F1 went from
+  0.000 in every seed to 0.35–0.40. The model now predicts `opinion` at all
+  (7, 15 and 9 times across the three seeds, against 0 before). That's still
+  under criterion 3's 0.45, so the criterion is still missed. This matches my
+  prediction: "off zero, but below 0.45."
+- **The model got much more stable.** Accuracy spread across seeds fell from
+  0.200 to 0.034. No seed collapsed: before, seed 7 called 29 of 30 posts
+  `technique`. Macro F1 rose in every seed, from about 0.26–0.50 to about
+  0.55–0.58. The model is better at all three labels at once, not just the
+  biggest one.
+- **Criterion 5 flipped to MET,** though seed 42 met it exactly at the line.
+- **Overall accuracy went down in two seeds (0.667 → 0.583 and 0.617), and I
+  don't think that means the model got worse.** Before, only a fifth of the
+  test posts were `opinion` (6 of 30), and the model never predicted it. It
+  got its accuracy by leaning on the biggest label. Now the test
+  set is balanced (20 of each), so the old "say `technique`" strategy can't
+  score well, and the model has to tell all three apart. Macro F1, which
+  weights each label equally, went up everywhere. That's the fairer
+  comparison here.
+- **The caveat:** before and after were scored on different test posts (30
+  vs 60, with different splits), because adding rows changes every split. So
+  this compares two datasets, not one model before and after on the same
+  posts. The direction of the changes is consistent across all three seeds,
+  which is why I trust it more than any single number.
+
+**Baseline vs. trained, after the improvement.** Because the data changed,
+the test split changed too. So I re-ran both baselines on the new 60 held-out
+posts (`test_split.csv`, seed 42 of the 400 rows), and compared them with the
+trained seed-42 model (`results.json`) on exactly those posts.
+
+| Measure | Baseline | Baseline-names-only | Trained | Difference |
+|---|---|---|---|---|
+| Overall accuracy | 0.383 | 0.483 | 0.583 | +0.200 |
+| Macro F1 | 0.287 | 0.415 | 0.553 | +0.266 |
+| F1 — `opinion` | 0.174 | 0.457 | 0.370 | +0.196 |
+| F1 — `technique` | 0.507 | 0.174 | 0.622 | +0.116 |
+| F1 — `reaction` | 0.182 | 0.613 | 0.667 | +0.485 |
+
+Difference is Trained minus Baseline (with definitions). The trained model
+now beats the baseline on every measure, by 0.20 accuracy and 0.27 macro F1.
+Before the improvement it was level on `opinion` (both 0.000). One thing
+carried over from before: the baseline still does better *without* my
+definitions (0.483 vs 0.383 accuracy). On `opinion`, names-only (0.457) even
+beats the trained model (0.370). The bare word "opinion" still tells a
+general model more than my definition does. That points at the definition
+wording, not the amount of data.
+
+**What's still wrong:** `opinion` is still the weak label, and the error has
+the same direction as before. In seed 42, 9 of 20 real opinions were called
+`technique` and 6 were called `reaction`. Opinions full of dish and
+ingredient names still read as `technique` to the model, and opinions told
+as stories read as `reaction`. More examples got the model to notice the
+label; it hasn't yet learned the boundary.
 
 
 
